@@ -17,7 +17,35 @@ var storage = {};
 storage.results = [];
 var objectId = 1;
 
+
 var requestHandler = function(request, response) {
+
+  var setStorage = function(newData){
+
+    // get storage
+    getStorage(function(err, data){
+      if(err){
+        throw err;
+      }
+      var storage = JSON.parse(data);
+
+      var newId = storage.results[0]["objectId"]+1;
+
+      newData.objectId = newId;
+
+      storage.results.unshift(newData);
+      fs.writeFile('server/database', JSON.stringify(storage));
+      response.end(JSON.stringify(newData));
+
+    })
+    // modify storage
+    // write storage to file JSON.stringify()
+  };
+
+  var getStorage = function(callback){
+    fs.readFile("server/database", callback);
+  };
+
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -60,14 +88,30 @@ var requestHandler = function(request, response) {
       response.writeHead(statusCode, headers);
 
       if(urlElems[2] === ''){
-        response.end(JSON.stringify(storage));
+
+        getStorage(function(err, data){
+          if(err){
+            throw err;
+          }
+          response.end(data);
+        });
+
       }else{
-        var results = _.filter(storage.results, function(item){
-         return (item['roomname'] === roomname);
-        })
-        var obj = {};
-        obj.results = results;
-        response.end(JSON.stringify(obj));
+        getStorage(function(err, data){
+          if(err){
+            throw err;
+          }
+
+          var storage = JSON.parse(data);
+
+          var results = _.filter(storage.results, function(item){
+           return (item['roomname'] === roomname);
+          })
+          var obj = {};
+          obj.results = results;
+          response.end(JSON.stringify(obj));
+        });
+
       }
 
     }else if(request.method === 'POST'){
@@ -88,10 +132,9 @@ var requestHandler = function(request, response) {
         newData.username = data.username;
         newData.message = data.message;
         newData.roomname = roomname;
-        newData.objectId = objectId;
-        objectId++;
-        storage.results.unshift(newData);
-        response.end(JSON.stringify(newData));
+
+        setStorage(newData);
+
       });
 
     }
@@ -99,50 +142,20 @@ var requestHandler = function(request, response) {
     statusCode = 200;
     headers['Content-Type'] = "application/json";
     response.writeHead(statusCode, headers);
-    response.end("TEST");
+    getStorage();
+    // response.write(end);
 
-  // }else if(request.url === "/"){
-  //   statusCode = 200;
-  //   headers['Content-Type'] = "text/html";
-  //   response.writeHead(statusCode, headers);
-  //   // fs.exists('client/index.html', function(exists){
-  //   //   if(exists){
-  //   //     response.write("EXISTS");
-  //   //   }else{
-  //   //     response.write("DOESNT EXISTS");
-  //   //   }
-  //   //   response.end();
-  //   // });
-  //   fs.readFile('client/index.html', function(err, html){
-  //     statusCode = 200;
-  //     headers['Content-Type'] = "text/html";
-  //     response.writeHead(statusCode, headers);
-  //     if(err){
-  //       throw err;
-  //     }
+    // response.end();
 
-  //     response.write(html);
-  //     response.end();
-  //   });
-  // }else if(request.url === "/styles/styles.css"){
-  //   statusCode = 200;
-  //   headers['Content-Type'] = "text/html";
-  //   response.writeHead(statusCode, headers);
-  //   fs.readFile('client/styles/', function(err, html){
-  //     statusCode = 200;
-  //     headers['Content-Type'] = "text/html";
-  //     response.writeHead(statusCode, headers);
-  //     if(err){
-  //       throw err;
-  //     }
-
-  //     response.write(html);
-  //     response.end();
-  //   });
   }else{
+
+    if(request.url.charAt(request.url.length-1) === '/'){
+      request.url += 'index.html';
+    }
+    // request.url = request.url.split('?')[0];
     fs.exists('client' + request.url, function(exists){
       if(exists){
-        fs.readFile('client/' + request.url, function(err, html){
+        fs.readFile('client' + request.url, function(err, html){
           statusCode = 200;
           var extention = request.url.split('.');
           extention = extention[extention.length-1];
@@ -171,7 +184,7 @@ var requestHandler = function(request, response) {
         response.writeHead(statusCode, headers);
         response.end();
       }
-    })
+    });
 
   }
   // Make sure to always call response.end() - Node may not send

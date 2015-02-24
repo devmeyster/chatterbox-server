@@ -13,15 +13,16 @@ $(function() {
 
     init: function() {
       // Get username
-      app.username = 'artur'; //window.location.search.substr(10);
+      app.username = $('#username').val() || 'anonymous';
 
       // Cache jQuery selectors
+
       app.$main = $('#main');
       app.$message = $('#message');
       app.$chats = $('#chats');
       app.$roomSelect = $('#roomSelect');
       app.$send = $('#send');
-
+      app.$username = $('#username');
       // Add listeners
       app.$main.on('click', '.username', app.addFriend);
       app.$send.on('submit', app.handleSubmit);
@@ -56,14 +57,12 @@ $(function() {
       });
     },
     fetch: function(animate) {
-      debugger;
 
       $.ajax({
         url: "http://localhost:3000/classes/",
         type: 'GET',
         contentType: 'application/json',
         success: function(data) {
-          debugger;
           console.log(data);
           console.log('chatterbox: Messages fetched');
           // Don't bother if we have nothing to work with
@@ -115,7 +114,7 @@ $(function() {
       }
     },
     populateRooms: function(results) {
-      app.$roomSelect.html('<option value="__newRoom">New room...</option><optoin value="lobby">lobby</option></select>');
+      app.$roomSelect.html('<option value="__newRoom">New room...</option><option value>All</option></select>');
 
       if (results) {
         var rooms = {};
@@ -142,11 +141,11 @@ $(function() {
       app.$roomSelect.append($option);
     },
     addMessage: function(data) {
-      if (!data.roomname)
-        data.roomname = 'lobby';
+      // if (!data.roomname)
+      //   data.roomname = 'lobby';
 
       // Only add messages that are in our current room
-      if (data.roomname === app.roomname) {
+      if (data.roomname === app.roomname || app.roomname === '') {
         // Create a div to hold the chats
         var $chat = $('<div class="chat"/>');
 
@@ -213,9 +212,8 @@ $(function() {
       }
     },
     handleSubmit: function(evt) {
-      debugger;
       var message = {
-        username: app.username,
+        username: app.$username.val(),
         message: app.$message.val(),
         roomname: app.roomname || 'lobby'
       };

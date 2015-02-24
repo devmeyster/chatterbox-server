@@ -6,10 +6,10 @@ body {
 }
 
 #main {
-    width: 500px;
+    width: 600px;
     margin: auto;
     text-align: left;
-    background: white;
+    background-image: url('../images/wallpaper.jpg');
     padding: 50px 60px;
     border: solid #ddd;
     border-width: 0 1px 1px 1px;
@@ -81,4 +81,43 @@ form input[type=text] {
 
 .spinner img {
     padding: 10px;
+}
+
+#username {
+    width: 150px;
+    height: 36px;
+    margin-bottom: 15px;
+    border-radius: 25px;
+    border-color: lightgrey;
+}
+#message {
+    width: 350px;
+    height: 36px;
+    margin-bottom: 15px;
+    border-radius: 25px;
+    border-color: lightgrey;
+}
+#rooms{
+    background-color: white;
+    width: 165px;
+    font-weight: bold;
+    border-radius: 15px;
+    padding: 5px;
+    border-color: lightgrey;
+   /* margin-bottom: 15px;
+    border-radius: 10px;
+    border-color: black;*/
+}
+
+.glyphicon {
+    margin-right: 5px;
+
+}
+
+h1 {
+    color: white;
+}
+
+h2 {
+    color: white;
 }
