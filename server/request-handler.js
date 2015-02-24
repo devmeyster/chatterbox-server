@@ -11,6 +11,10 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+var qs = require('querystring');
+
+var storage = {};
+storage.results = [];
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -28,7 +32,6 @@ var requestHandler = function(request, response) {
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
   console.log("Serving request type " + request.method + " for url " + request.url);
-
   // The outgoing status.
   var statusCode = 200;
 
@@ -43,8 +46,50 @@ var requestHandler = function(request, response) {
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
+  // response.write(request.url);
+  if(request.url === "/classes/messages"){
 
+    if(request.method === 'GET'){
+      //return username and msg
+      headers['Content-Type'] = "application/json";
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify(storage));
+
+    }else if(request.method === 'POST'){
+      statusCode = 201;
+      headers['Content-Type'] = "application/json";
+      response.writeHead(statusCode, headers);
+
+      var body = "";
+      request.on('data', function(data){
+        body += data;
+      });
+
+      request.on('end', function(){
+
+        var data = JSON.parse(body);
+        var newData = {};
+
+        newData.username = data.username;
+        newData.message = data.message;
+        storage.results.push(newData);
+        response.end(JSON.stringify(newData));
+      });
+
+    }
+  }else if(request.url === "/log"){
+    statusCode = 200;
+    headers['Content-Type'] = "application/json";
+    response.writeHead(statusCode, headers);
+    response.end("TEST");
+
+  }else {
+    statusCode = 404;
+    headers['Content-Type'] = "application/json";
+    response.writeHead(statusCode, headers);
+    response.end();
+
+  }
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
   // response.end() will be the body of the response - i.e. what shows
@@ -52,7 +97,7 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end("Hello, World!");
+  // response.end("Hello, World!");
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -71,3 +116,4 @@ var defaultCorsHeaders = {
   "access-control-max-age": 10 // Seconds.
 };
 
+module.exports = requestHandler;
