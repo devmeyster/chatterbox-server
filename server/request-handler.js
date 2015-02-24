@@ -52,8 +52,6 @@ var requestHandler = function(request, response) {
   if(urlElems[1] === "classes"){
 
     var roomname = urlElems[2];
-    console.log(roomname);
-    console.log(storage);
     if(request.method === 'GET'){
       //return username and msg
       headers['Content-Type'] = "application/json";
@@ -64,7 +62,6 @@ var requestHandler = function(request, response) {
       })
       var obj = {};
       obj.results = results;
-      console.log(obj.results);
       response.end(JSON.stringify(obj));
 
     }else if(request.method === 'POST'){
@@ -81,8 +78,6 @@ var requestHandler = function(request, response) {
 
         var data = JSON.parse(body);
         var newData = {};
-        console.log(data);
-        console.log(body);
 
         newData.username = data.username;
         newData.message = data.message;
@@ -131,4 +126,4 @@ var defaultCorsHeaders = {
   "access-control-max-age": 10 // Seconds.
 };
 
-module.exports = requestHandler;
+exports.requestHandler = requestHandler;
