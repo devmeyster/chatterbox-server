@@ -11,7 +11,7 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-var qs = require('querystring');
+var _ = require("underscore");
 
 var storage = {};
 storage.results = [];
@@ -47,13 +47,25 @@ var requestHandler = function(request, response) {
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   // response.write(request.url);
-  if(request.url === "/classes/messages"){
+  var urlElems = request.url.split("/");
 
+  if(urlElems[1] === "classes"){
+
+    var roomname = urlElems[2];
+    console.log(roomname);
+    console.log(storage);
     if(request.method === 'GET'){
       //return username and msg
       headers['Content-Type'] = "application/json";
       response.writeHead(statusCode, headers);
-      response.end(JSON.stringify(storage));
+
+      var results = _.filter(storage.results, function(item){
+       return (item['roomname'] === roomname);
+      })
+      var obj = {};
+      obj.results = results;
+      console.log(obj.results);
+      response.end(JSON.stringify(obj));
 
     }else if(request.method === 'POST'){
       statusCode = 201;
@@ -69,9 +81,12 @@ var requestHandler = function(request, response) {
 
         var data = JSON.parse(body);
         var newData = {};
+        console.log(data);
+        console.log(body);
 
         newData.username = data.username;
         newData.message = data.message;
+        newData.roomname = roomname;
         storage.results.push(newData);
         response.end(JSON.stringify(newData));
       });
