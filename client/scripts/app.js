@@ -5,15 +5,15 @@ $(function() {
   app = {
 //TODO: The current 'addFriend' function just adds the class 'friend'
 //to all messages sent by the user
-    server: 'https://api.parse.com/1/classes/chatterbox/',
     username: 'anonymous',
     roomname: 'lobby',
+    server: 'http://localhost:3000/classes/lobby',
     lastMessageId: 0,
     friends: {},
 
     init: function() {
       // Get username
-      app.username = window.location.search.substr(10);
+      app.username = 'artur'; //window.location.search.substr(10);
 
       // Cache jQuery selectors
       app.$main = $('#main');
@@ -28,7 +28,7 @@ $(function() {
       app.$roomSelect.on('change', app.saveRoom);
 
       // Fetch previous messages
-      app.startSpinner();
+      // app.startSpinner();
       app.fetch(false);
 
       // Poll for new messages
@@ -56,19 +56,21 @@ $(function() {
       });
     },
     fetch: function(animate) {
+      debugger;
+
       $.ajax({
-        url: app.server,
+        url: "http://localhost:3000/classes/",
         type: 'GET',
         contentType: 'application/json',
-        data: { order: '-createdAt'},
         success: function(data) {
+          debugger;
+          console.log(data);
           console.log('chatterbox: Messages fetched');
-
           // Don't bother if we have nothing to work with
           if (!data.results || !data.results.length) { return; }
 
           // Get the last message
-          var mostRecentMessage = data.results[data.results.length-1];
+          var mostRecentMessage = data.results[0];
           var displayedRoom = $('.chat span').first().data('roomname');
           app.stopSpinner();
           // Only bother updating the DOM if we have a new message
@@ -113,7 +115,7 @@ $(function() {
       }
     },
     populateRooms: function(results) {
-      app.$roomSelect.html('<option value="__newRoom">New room...</option><option value="" selected>Lobby</option></select>');
+      app.$roomSelect.html('<option value="__newRoom">New room...</option><optoin value="lobby">lobby</option></select>');
 
       if (results) {
         var rooms = {};
@@ -133,9 +135,9 @@ $(function() {
       app.$roomSelect.val(app.roomname);
     },
     addRoom: function(roomname) {
+      console.log(roomname);
       // Prevent XSS by escaping with DOM methods
       var $option = $('<option/>').val(roomname).text(roomname);
-
       // Add to select
       app.$roomSelect.append($option);
     },
@@ -158,7 +160,7 @@ $(function() {
           $username.addClass('friend');
 
         var $message = $('<br><span/>');
-        $message.text(data.text).appendTo($chat);
+        $message.text(data.message).appendTo($chat);
 
         // Add the message to the UI
         app.$chats.append($chat);
@@ -182,13 +184,14 @@ $(function() {
     saveRoom: function(evt) {
 
       var selectIndex = app.$roomSelect.prop('selectedIndex');
+      console.log("test 3: " + selectIndex);
       // New room is always the first option
       if (selectIndex === 0) {
         var roomname = prompt('Enter room name');
         if (roomname) {
           // Set as the current room
           app.roomname = roomname;
-
+          app.server = 'http://localhost:3000/classes/'+roomname;
           // Add the room to the menu
           app.addRoom(roomname);
 
@@ -203,15 +206,17 @@ $(function() {
         app.startSpinner();
         // Store as undefined for empty names
         app.roomname = app.$roomSelect.val();
+        app.server = 'http://localhost:3000/classes/'+app.roomname;
 
         // Fetch messages again
         app.fetch();
       }
     },
     handleSubmit: function(evt) {
+      debugger;
       var message = {
         username: app.username,
-        text: app.$message.val(),
+        message: app.$message.val(),
         roomname: app.roomname || 'lobby'
       };
 
