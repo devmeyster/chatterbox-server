@@ -213,7 +213,7 @@ $(function() {
     },
     handleSubmit: function(evt) {
       var message = {
-        username: app.$username.val(),
+        username: app.$username.val() || app.username,
         message: app.$message.val(),
         roomname: app.roomname || 'lobby'
       };
