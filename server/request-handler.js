@@ -14,7 +14,6 @@ this file and include it in basic-server.js so that it actually works.
 var _ = require('underscore');
 var fs = require('fs');
 var express = require('express');
-var path = require('path');
 var app = express();
 var bodyParser = require('body-parser');
 
@@ -67,7 +66,12 @@ app.post('/classes/:roomname?', function(req, res){
     }
     var storage = JSON.parse(data);
 
-    var newId = storage.results[0]['objectId']+1;
+    var newId;
+    if(storage.results[0] === undefined){
+      newId = 1;
+    }else{
+      newId = storage.results[0]['objectId']+1;
+    }
 
     newData.objectId = newId;
 

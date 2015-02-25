@@ -17,8 +17,6 @@ body {
     background: -ms-linear-gradient(top,  #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%); /* IE10+ */
     background: linear-gradient(to bottom,  #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1e5799', endColorstr='#7db9e8',GradientType=0 ); /* IE6-9 */
-
-    /*background-image: url('../images/wallpaper.jpg');*/
     padding: 50px 60px;
     border: solid #ddd;
     border-width: 0 1px 1px 1px;
@@ -113,9 +111,6 @@ form input[type=text] {
     border-radius: 15px;
     padding: 5px;
     border-color: lightgrey;
-   /* margin-bottom: 15px;
-    border-radius: 10px;
-    border-color: black;*/
 }
 
 .glyphicon {

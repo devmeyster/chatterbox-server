@@ -1,5 +1,3 @@
-// YOUR CODE HERE:
-
 var app;
 $(function() {
   app = {
